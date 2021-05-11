@@ -1,12 +1,41 @@
+# Import the necessary packages
 import cv2
 import numpy as np
 
-image = cv2.imread("addWeight-embed.png")
 
-scale = 2.0
-threshold = -160
+def back_rm(filename):
+    # Load the image
+    img = cv2.imread(filename)
 
-output = scale * image + threshold #Since most of the watermarks have less opacity than the content of the image, we scale the image up by 2 and decrease the value of the scaled image by the threshold
-output = np.clip(output, 0, 255).astype(np.uint8) #The value < 0 will be set to 0 and the value more than 255 will be set to 255. After that they will be store in the 8 bits int data type
+    # Convert the image to grayscale
+    gr = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-cv2.imwrite("./output/scale-extract.png", output)
+    # Make a copy of the grayscale image
+    bg = gr.copy()
+
+    # Apply morphological transformations
+    for i in range(5):
+        kernel2 = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * i + 1, 2 * i + 1))
+        bg = cv2.morphologyEx(bg, cv2.MORPH_CLOSE, kernel2)
+        bg = cv2.morphologyEx(bg, cv2.MORPH_OPEN, kernel2)
+
+    # Subtract the grayscale image from its processed copy
+    dif = cv2.subtract(bg, gr)
+
+    # Apply thresholding
+    bw = cv2.threshold(dif, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
+    dark = cv2.threshold(bg, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
+
+    # Extract pixels in the dark region
+    darkpix = gr[np.where(dark > 0)]
+
+    # Threshold the dark region to get the darker pixels inside it
+    darkpix = cv2.threshold(darkpix, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+
+    # Paste the extracted darker pixels in the watermark region
+    bw[np.where(dark > 0)] = darkpix.T
+
+    cv2.imwrite('final.jpg', bw)
+
+
+back_rm('sample-watermark-img.jpg')

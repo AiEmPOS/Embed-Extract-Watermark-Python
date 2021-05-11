@@ -1,10 +1,9 @@
 import numpy as np
 import cv2
+from PIL import Image
 
-def addWatermark(logo_img, original_img, opacity, pos=(100,10)):
+def addWatermarkImBlend(logo_img, original_img):
     
-    opacity = opacity / 100
-
     image = cv2.cvtColor(original_img, cv2.COLOR_BGR2BGRA)
     print((image.shape[0], image.shape[1]))
     watermark = cv2.cvtColor(logo_img, cv2.COLOR_BGR2BGRA)
@@ -23,6 +22,19 @@ def addWatermark(logo_img, original_img, opacity, pos=(100,10)):
     # cv2.imshow('output', output)
     # cv2.waitKey()
 
+def addWatermarkPaste(logo_img, original_img):
+    
+    width, height = original_img.size 
+    logo_img = logo_img.resize((int(width), int(height/2)))
+    
+    # Pasting logo_img image on top of original_img 
+    # starting at coordinates (0, 0)
+    original_img.paste(logo_img, (0, int(height/4)), mask = logo_img)
+    
+    # Displaying the image
+    original_img.show()
+
+
 def scaleUpExtractWatermark(img, scale, threshold):
 
     output = scale * img - threshold # Since most of the watermarks have less opacity than the content of the image, we scale the image up by 2 and decrease the value of the scaled image by the threshold
@@ -35,7 +47,15 @@ watermark = cv2.imread("logoict.png", -1)
 
 print("read successfully")
 
-addWatermark(watermark, image, 100)
+# addWatermarkImBlend(watermark, image)
 
 # image = cv2.imread("addWeight-embed.png")
 # scaleUpExtractWatermark(image, 2, 160)
+
+# Opening the primary image (used in background)
+image = Image.open(r"test00.png")
+# Opening the secondary image (overlay image)
+watermark = Image.open(r"logoict40opa.png")
+
+addWatermarkPaste(image, watermark)
+
