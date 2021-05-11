@@ -26,13 +26,21 @@ def addWatermarkPaste(logo_img, original_img):
     
     width, height = original_img.size 
     logo_img = logo_img.resize((int(width), int(height/2)))
-    
+    output = Image.new(mode = "RGBA", size = (width, height), color = (0, 0, 0, 0))
+
+    output.paste(original_img, (0, 0), mask = original_img)
+    output.paste(logo_img, (0, int(height/4)), mask = logo_img)
+    # output.paste(original_img, (0, 0), mask = original_img)
+    output.show()
+
     # Pasting logo_img image on top of original_img 
     # starting at coordinates (0, 0)
-    original_img.paste(logo_img, (0, int(height/4)), mask = logo_img)
+    
+    # original_img.paste(logo_img, (0, int(height/4)), mask = logo_img)
     
     # Displaying the image
-    original_img.show()
+    
+    # original_img.show()
 
 
 def scaleUpExtractWatermark(img, scale, threshold):
@@ -55,7 +63,7 @@ print("read successfully")
 # Opening the primary image (used in background)
 image = Image.open(r"test00.png")
 # Opening the secondary image (overlay image)
-watermark = Image.open(r"logoict40opa.png")
+watermark = Image.open(r"logoict.png")
 
-addWatermarkPaste(image, watermark)
+addWatermarkPaste(watermark, image)
 

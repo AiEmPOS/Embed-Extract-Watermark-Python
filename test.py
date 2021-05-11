@@ -2,7 +2,6 @@
 import cv2
 import numpy as np
 
-
 def back_rm(filename):
     # Load the image
     img = cv2.imread(filename)
@@ -35,7 +34,7 @@ def back_rm(filename):
     # Paste the extracted darker pixels in the watermark region
     bw[np.where(dark > 0)] = darkpix.T
 
-    cv2.imwrite('final.jpg', bw)
+    cv2.imwrite('./output/grayScaleExtract.jpg', bw)
 
 
 back_rm('sample-watermark-img.jpg')
