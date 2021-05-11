@@ -34,7 +34,7 @@ def back_rm(filename):
     # Paste the extracted darker pixels in the watermark region
     bw[np.where(dark > 0)] = darkpix.T
 
-    cv2.imwrite('./output/grayScaleExtract.jpg', bw)
-
+    cv2.imwrite('./output/grayScale-extract.png', bw)
 
 back_rm('sample-watermark-img.jpg')
+# back_rm('./output/paste-embed.png')
